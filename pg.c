@@ -112,12 +112,12 @@ void report(){
             printf("1. Rent Collection Efficiency Report\n");
             printf("2. Room Utilization Report\n");
             printf("3. Lunch Demand Summary Report\n");
-            printf("4. Back To Main Menu");
+            printf("4. Back To Main Menu\n");
 
             int choice;
             printf("Enter Choice - ");
             scanf("%d",&choice);
-            
+
     }
 }
 
