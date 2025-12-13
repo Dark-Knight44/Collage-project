@@ -15,7 +15,7 @@ struct customer{
 
 void pc_management(){
     printf("\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n");
-    printf("\t USER SESSION MANAGEMENT\n");
+    printf("\t PC MANAGEMENT\n");
     printf("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n\n");
     printf("1. Add PC\n");
     printf("2. Remove Game \n");
@@ -23,10 +23,27 @@ void pc_management(){
     printf("4. Assign Game To Pc\n");
     printf("5. View Games Assigned to PCs\n");
     printf("6. Back to Main Menu\n");
+
+    int choice;
+
+    printf("Enter Your Choice - ");
+    scanf("%d",&choice);
 }
 
 void user_management(){
-    
+    printf("\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n");
+    printf("\t USER SESSION MANAGEMENT\n");
+    printf("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n\n");
+    printf("1. Start New Session\n");
+    printf("2. End Session\n");
+    printf("3. Search Session by User ID\n");
+    printf("4. View Active Session\n");
+    printf("5. Back to Main Menu\n");
+
+    int choice;
+
+    printf("Enter Your Choice - ");
+    scanf("%d",&choice);
 }
 
 
@@ -48,6 +65,8 @@ int main(){
 
     if(choice==1){
         pc_management();
+    }else if(choice==2){
+        user_management();
     }
     return 0;
 }
