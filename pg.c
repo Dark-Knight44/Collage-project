@@ -1,5 +1,5 @@
 #include<stdio.h>
-
+#include<stdbool.h>
 
 
 typedef struct{
@@ -12,6 +12,7 @@ typedef struct{
     char name[20];
     int student_id;
     int room;
+    bool is_paid;
     char phone_nuber[11];
     char course[10];
     date doj;
@@ -23,6 +24,15 @@ typedef struct{
     char name[20];
     int room;
 }lunch;
+
+
+typedef struct{
+    int rno;
+    student std1;
+    student std2;
+    student std3;
+    bool lock ;
+}room;
 
 void manage_students(){
     printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
@@ -37,6 +47,78 @@ void manage_students(){
     int choice;
     printf("Enter Choice - ");
     scanf("%d",&choice);
+}
+
+
+void manage_room(){
+    while(1){
+        printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+        printf("\t ROOM MANAGEMENT\n");
+        printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+        printf("1. View Room Status\n");
+        printf("2. View Vacant Beds\n");
+        printf("3. Shift Student\n");
+        printf("4. Lock Room \n");
+        printf("5. Back to Menu\n");
+
+        int choice;
+        printf("Enter Choice - ");
+        scanf("%d",&choice);
+    }
+}
+
+
+void manage_lunch(){
+    while(1){
+        printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+        printf("\t LUNCH MANAGEMENT\n");
+        printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+        printf("1. Sumbit Lunch Box Request\n");
+        printf("2. Modify The Request\n");
+        printf("3. Delete The Request\n");
+        printf("4. Veiw Today's Delivery Schedule\n");
+        printf("5. Veiw Student Lunch History\n");
+        printf("6. Back to Main Menu\n");
+
+        int choice;
+        printf("Enter Choice - ");
+        scanf("%d",&choice);
+    }
+}
+
+
+void rent(){
+    while(1){
+        printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+        printf("\t RENT AND PAYEMENT\n");
+        printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+        printf("1. Set Monthly Payment (8k default)\n");
+        printf("2. Record Payment\n");
+        printf("3. View Payment Status\n");
+        printf("4. View Pending Students \n");
+        printf("5. Back To Main Menu\n");
+
+        int choice;
+        printf("Enter Choice - ");
+        scanf("%d",&choice);
+    }
+}
+
+void report(){
+        while(1){
+            printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+            printf("\t REPORTS\n");
+            printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+            printf("1. Rent Collection Efficiency Report\n");
+            printf("2. Room Utilization Report\n");
+            printf("3. Lunch Demand Summary Report\n");
+            printf("4. Back To Main Menu");
+
+            int choice;
+            printf("Enter Choice - ");
+            scanf("%d",&choice);
+            
+    }
 }
 
 
@@ -58,6 +140,14 @@ int main() {
 
         if(choice==1){
             manage_students();
+        }else if(choice==2){
+            manage_room();
+        }else if(choice==3){
+            manage_lunch();
+        }else if(choice==4){
+            rent();
+        }else if(choice==5){
+            report();
         }
     }
     return 0;
