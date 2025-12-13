@@ -84,7 +84,7 @@ void manage_lunch(){
         printf("Enter Choice - ");
         scanf("%d",&choice);
     }
-}
+} 
 
 
 void rent(){
