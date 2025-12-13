@@ -53,7 +53,7 @@ void add_student(){
     printf("\nEnter Course Name - ");
     fgets(s1.course,20,stdin);
 
-    fprintf(file,"%d,%s,%s,%s,%d,%s",randint())
+    
 
 }
 
