@@ -1,6 +1,7 @@
 #include<stdio.h>
 #include<stdbool.h>
-
+#include<time.h>
+#include<stdlib.h>
 
 typedef struct{
     int date;
@@ -13,7 +14,7 @@ typedef struct{
     int student_id;
     int room;
     bool is_paid;
-    char phone_nuber[11];
+    char phone_number[11];
     char course[10];
     date doj;
 }student;
@@ -34,6 +35,29 @@ typedef struct{
     bool lock ;
 }room;
 
+
+
+void add_student(){
+
+    FILE *file;
+
+    fopen("students.csv","a+");
+
+    student s1;
+    printf("\nEnter Name Of Student - ");
+    fgets(s1.name,20,stdin);
+
+    printf("\nEnter Phone Number - ");
+    fgets(s1.phone_number,20,stdin);
+
+    printf("\nEnter Course Name - ");
+    fgets(s1.course,20,stdin);
+
+    fprintf(file,"%d,%s,%s,%s,%d,%s",randint())
+
+}
+
+
 void manage_students(){
     printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
     printf("\t STUDENT MANAGEMENT\n");
@@ -47,6 +71,9 @@ void manage_students(){
     int choice;
     printf("Enter Choice - ");
     scanf("%d",&choice);
+
+    if(choice==1){
+    }
 }
 
 
