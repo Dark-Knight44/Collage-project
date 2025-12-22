@@ -183,6 +183,26 @@ void view_all_students(){
     fclose(file_of_students);
 }
 
+void search_student(){
+    int sid;
+    printf("Enter Student ID - ");
+    scanf("%d",&sid);
+
+    FILE *file;
+    file=fopen("students.dat","rb+");
+    student s;
+    system("clear");
+    while(fread(&s,sizeof(student),1,file)==1){
+        if(s.student_id==sid){
+            printf("NAME - %s\nPhone no. - %s\nCourse - %s\nRoom no.%d\nPaid - %s\nDate of Join - %d-%d-%d\n\n",s.name,s.phone_number,s.course,s.room,s.is_paid?"yes":"no",s.doj.date,s.doj.month,s.doj.year);
+            fclose(file);
+            return;
+        }
+    }
+    printf("No Student Found");
+    fclose(file);
+}
+
 
 void manage_students(){
     printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
@@ -195,15 +215,23 @@ void manage_students(){
     printf("5. Back To Main Menu\n");
 
     int choice;
-    printf("Enter Choice - ");
-    scanf("%d",&choice);
+    while(1){
+        printf("Enter Choice - ");
+        scanf("%d",&choice);
 
-    if(choice==1){
-        add_student();
-    }else if(choice==2){
-        edit_student_details();
-    }else if(choice==3){
-        view_all_students();
+        if(choice==1){
+            add_student();
+        }else if(choice==2){
+            edit_student_details();
+        }else if(choice==3){
+            view_all_students();
+        }else if(choice==4){
+            search_student();
+        }else if(choice==5){
+            main();
+        }else{
+            printf("Please Enter Valid Option");
+        }
     }
 }
 void view_all_rooms(){
