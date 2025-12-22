@@ -15,7 +15,7 @@ typedef struct{
     int student_id;
     int room;
     bool is_paid;
-    char phone_number[11];
+    char phone_number[12];
     char course[10];
     date doj;
 }student;
@@ -31,6 +31,7 @@ typedef struct{
 typedef struct {
     int rno;
     student students[3];
+    int count;
     bool lock ;
 }room;
 
@@ -46,85 +47,82 @@ void add_student(){
     s1.name[strcspn(s1.name,"\n")]='\0';
 
     printf("\nEnter Phone Number - ");
-    fgets(s1.phone_number,11,stdin);
+    fgets(s1.phone_number,12,stdin);
     s1.phone_number[strcspn(s1.phone_number,"\n")]='\0';
 
     printf("\nEnter Course Name - ");
     fgets(s1.course,10,stdin);
     s1.course[strcspn(s1.course,"\n")]='\0';
 
-    printf("Enter date of joining(dd-mm-yyyy) - ");
+    printf("Enter date of joining(dd mm yyyy) - ");
     scanf("%d %d %d",&s1.doj.date,&s1.doj.month,&s1.doj.year);
-
+    s1.is_paid=1;
     //for id
 
-    FILE *file;
-
-    file=fopen("students.dat","rb");
-
-    fseek(file,-sizeof(student),SEEK_END);
-
+    FILE *File_of_students;
+    File_of_students=fopen("students.dat","rb");
     student s_last;
 
-    fread(&s_last,sizeof(student),1,file);
+    fseek(File_of_students,-sizeof(student),SEEK_END);
+    fread(&s_last,sizeof(student),1,File_of_students);
 
     s1.student_id=s_last.student_id+1;
+    fclose(File_of_students);
 
     //for rno.
-    
     room r;
-
     FILE *file_of_room;
-
-    file_of_room=fopen("rooms.dat","a+");
+    file_of_room=fopen("rooms.dat","rb+");
 
     fseek(file_of_room, - sizeof(room),SEEK_END);
-
     fread(&r,sizeof(room),1,file_of_room);
 
-    int students_init=sizeof(r.students)/sizeof(r.students[0]);
     
-    if(students_init<=3){
-        r.students[students_init+1]=s1;
+    if(r.count<2){
+        r.students[r.count]=s1;
+        r.count+=1;
+        s1.room=r.rno;
+        fseek(file_of_room, -sizeof(room),SEEK_END);
+        fwrite(&r,sizeof(room),1,file_of_room);
     }else{
-        r.rno=r.rno+1;
-        r.students[0]=s1;
-        r.lock=0;
-
-        fseek(file, - sizeof(room),SEEK_END);
+        room new_room;
+        new_room.rno=r.rno+1;
+        new_room.count=1;
+        new_room.lock=0;
+        s1.room=new_room.rno;
+        new_room.students[0]=s1;
+        fseek(file_of_room, 0,SEEK_END);
+        fwrite(&new_room,sizeof(room),1,file_of_room);
     }
-
-    //writing in file
-
-    fwrite(&r,sizeof(room),1,file_of_room);
-
+   
     fclose(file_of_room);
     
-    FILE *file1;
+    ///
+    
+    FILE *file_of_students;
 
-    file1=fopen("students.dat","ab+");
+    file_of_students=fopen("students.dat","ab+");
 
-    fwrite(&s1,sizeof(student),1,file);
+    fwrite(&s1,sizeof(student),1,file_of_students);
 
     printf("succsess");
     
-    fclose(file1);
+    fclose(file_of_students);
 
 }
 
 
 
 void view_all_students(){
-    FILE *file;
-    file=fopen("students.dat","rb");
+    FILE *file_of_students;
+    file_of_students=fopen("students.dat","rb");
     student s1;
     int temp;
-    while(fread(&s1,sizeof(student),1,file)==1){
-        system("clear");
-        printf("Student ID :%s\n,Student Name -%s\n Phone Number -%s\n Room Number - %d\n Paid -%s\nCourse - %s",s1.student_id,s1.name,s1.phone_number,s1.room,(s1.is_paid?"yes":"no"),s1.course);
-        scanf("%d",&temp);
-    }
-    fclose(file);
+    system("clear");
+    while(fread(&s1,sizeof(student),1,file_of_students)==1){
+        printf("Student ID :%d\nStudent Name -%s\nPhone Number - %s\nRoom Number - %d\nPaid -%s\nCourse - %s\n\n",s1.student_id,s1.name,s1.phone_number,s1.room,(s1.is_paid?"yes":"no"),s1.course);
+    }scanf("%d",&temp);
+    fclose(file_of_students);
 }
 
 
