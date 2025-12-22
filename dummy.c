@@ -60,7 +60,7 @@ int main(){
 
 
     room r;
-    r.count=0;
+    r.count=1;
     r.lock=0;
     r.rno=1;
     r.students[0]=s1;

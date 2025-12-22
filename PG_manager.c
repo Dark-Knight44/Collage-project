@@ -78,7 +78,7 @@ void add_student(){
     fread(&r,sizeof(room),1,file_of_room);
 
     
-    if(r.count<2){
+    if(r.count<3){
         r.students[r.count]=s1;
         r.count+=1;
         s1.room=r.rno;
@@ -111,6 +111,64 @@ void add_student(){
 
 }
 
+void edit_student_details(){
+    
+    int stu_id;
+    printf("Enter Student Id -");
+    scanf("%d",&stu_id);
+
+    FILE *file;
+    file=fopen("students.dat","rb+");
+
+    student stu;
+    while (getchar() != '\n');
+
+    while(fread(&stu,sizeof(student),1,file)==1){
+        if(stu_id==stu.student_id){
+            printf("\nEnter Name Of Student - ");
+            fgets(stu.name,20,stdin);
+            stu.name[strcspn(stu.name,"\n")]='\0';
+
+            printf("\nEnter Phone Number - ");
+            fgets(stu.phone_number,12,stdin);
+            stu.phone_number[strcspn(stu.phone_number,"\n")]='\0';
+
+            printf("\nEnter Course Name - ");
+            fgets(stu.course,10,stdin);
+            stu.course[strcspn(stu.course,"\n")]='\0';
+
+            printf("Enter date of joining(dd mm yyyy) - ");
+            scanf("%d %d %d",&stu.doj.date,&stu.doj.month,&stu.doj.year);
+
+            fseek(file,-sizeof(student),SEEK_CUR);
+            fwrite(&stu,sizeof(student),1,file);
+            printf("\nUpdated The Records in Student File\n");
+
+            fclose(file);
+
+            FILE *file_of_room;
+            file_of_room=fopen("rooms.dat","rb+");
+            room r;
+            
+            while(fread(&r,sizeof(room),1,file_of_room)==1){
+                if(stu.room==r.rno){
+                    for(int i=0;i<r.count;i++){
+                        if(r.students[i].student_id==stu.student_id){
+                            r.students[i]=stu;
+                            fseek(file_of_room,-sizeof(room),SEEK_CUR);
+                            fwrite(&r,sizeof(room),1,file_of_room);
+                            printf("Updated The Records IN Room File\n");
+                            fclose(file);
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    printf("Student ID Not Found");
+    fclose(file);
+}
 
 
 void view_all_students(){
@@ -131,7 +189,7 @@ void manage_students(){
     printf("\t STUDENT MANAGEMENT\n");
     printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
     printf("1. Add Students\n");
-    printf("2. Remove Students\n");
+    printf("2. Edit Student Details\n");
     printf("3. View All Students\n");
     printf("4. Search Students\n");
     printf("5. Back To Main Menu\n");
@@ -142,26 +200,42 @@ void manage_students(){
 
     if(choice==1){
         add_student();
+    }else if(choice==2){
+        edit_student_details();
     }else if(choice==3){
         view_all_students();
     }
 }
-
+void view_all_rooms(){
+    FILE *file;
+    file=fopen("rooms.dat","rb+");
+    room r;
+    system("clear");
+    while(fread(&r,sizeof(room),1,file)==1){
+        printf("Room No. - %d\nlock - %s\n",r.rno,r.lock?"yes\n":"no\n");
+        for(int i=0;i<r.count;i++){
+            printf("%d. Student Name -%s\n",i,r.students[i].name);
+        }
+    }
+    fclose(file);
+}
 
 void manage_room(){
     while(1){
         printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
         printf("\t ROOM MANAGEMENT\n");
         printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-        printf("1. View Room Status\n");
-        printf("2. View Vacant Beds\n");
-        printf("3. Shift Student\n");
-        printf("4. Lock Room \n");
-        printf("5. Back to Menu\n");
+        printf("1. View All Room \n");
+        printf("2. Shift Student\n");
+        printf("3. Lock Room \n");
+        printf("4. Back to Menu\n");
 
         int choice;
         printf("Enter Choice - ");
         scanf("%d",&choice);
+        if(choice==1){
+            view_all_rooms();
+        }
     }
 }
 
