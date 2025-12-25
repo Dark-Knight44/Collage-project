@@ -36,6 +36,49 @@ typedef struct {
 }room;
 
 
+void view_all_students();
+void edit_student_details();
+void view_all_students();
+void search_student();
+void manage_students();
+void view_all_rooms();
+void manage_room();
+void manage_lunch();
+void rent();
+void report();
+void shift_student();
+
+
+int main() {
+    while(1){
+        printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+        printf("\t PG MANAGEMENT SYSTEM\n");
+        printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+        printf("1. Manage Students\n");
+        printf("2. Manage Rooms\n");
+        printf("3. Manage Lunch Boxs\n");
+        printf("4. Rent And Payment \n");
+        printf("5. Report\n");
+        printf("6. Exit\n");
+
+        int choice;
+        printf("Enter Choice - ");
+        scanf("%d",&choice);
+
+        if(choice==1){
+            manage_students();
+        }else if(choice==2){
+            manage_room();
+        }else if(choice==3){
+            manage_lunch();
+        }else if(choice==4){
+            rent();
+        }else if(choice==5){
+            report();
+        }
+    }
+    return 0;
+}
 
 void add_student(){
 
@@ -73,31 +116,17 @@ void add_student(){
     room r;
     FILE *file_of_room;
     file_of_room=fopen("rooms.dat","rb+");
-
-    fseek(file_of_room, - sizeof(room),SEEK_END);
-    fread(&r,sizeof(room),1,file_of_room);
-
-    
-    if(r.count<3){
-        r.students[r.count]=s1;
-        r.count+=1;
-        s1.room=r.rno;
-        fseek(file_of_room, -sizeof(room),SEEK_END);
-        fwrite(&r,sizeof(room),1,file_of_room);
-    }else{
-        room new_room;
-        new_room.rno=r.rno+1;
-        new_room.count=1;
-        new_room.lock=0;
-        s1.room=new_room.rno;
-        new_room.students[0]=s1;
-        fseek(file_of_room, 0,SEEK_END);
-        fwrite(&new_room,sizeof(room),1,file_of_room);
+    while(fread(&r,sizeof(room),1,file_of_room)==1){
+        if(r.count<3){
+            r.students[r.count]=s1;
+            r.count+=1;
+            s1.room=r.rno;
+            fseek(file_of_room,-sizeof(room),SEEK_CUR);
+            fwrite(&r,sizeof(room),1,file_of_room);
+            fclose(file_of_room);
+            break;
+        }
     }
-   
-    fclose(file_of_room);
-    
-    ///
     
     FILE *file_of_students;
 
@@ -105,10 +134,10 @@ void add_student(){
 
     fwrite(&s1,sizeof(student),1,file_of_students);
 
-    printf("succsess");
+    printf("succsess\n\n");
     
     fclose(file_of_students);
-
+    manage_students();
 }
 
 void edit_student_details(){
@@ -175,12 +204,12 @@ void view_all_students(){
     FILE *file_of_students;
     file_of_students=fopen("students.dat","rb");
     student s1;
-    int temp;
     system("clear");
     while(fread(&s1,sizeof(student),1,file_of_students)==1){
         printf("Student ID :%d\nStudent Name -%s\nPhone Number - %s\nRoom Number - %d\nPaid -%s\nCourse - %s\n\n",s1.student_id,s1.name,s1.phone_number,s1.room,(s1.is_paid?"yes":"no"),s1.course);
-    }scanf("%d",&temp);
+    }
     fclose(file_of_students);
+    manage_students();
 }
 
 void search_student(){
@@ -240,12 +269,73 @@ void view_all_rooms(){
     room r;
     system("clear");
     while(fread(&r,sizeof(room),1,file)==1){
-        printf("Room No. - %d\nlock - %s\n",r.rno,r.lock?"yes\n":"no\n");
+        printf("====================Room No. - %d====================",r.rno);
+        printf("\nlock - %s , count=%d\n",r.lock?"yes\n":"no\n",r.count);
         for(int i=0;i<r.count;i++){
-            printf("%d. Student Name -%s\n",i,r.students[i].name);
+            printf("%d. Student Name -%s\n\n",i+1,r.students[i].name);
         }
     }
+    char temp;
+    scanf("%c",&temp);
     fclose(file);
+}
+
+void shift_student(){
+    int sid;
+    printf("Enter Student ID - ");
+    scanf("%d",&sid);
+    student s;
+    FILE *file_of_students;
+    file_of_students=fopen("students.dat","rb+");
+    while(fread(&s,sizeof(student),1,file_of_students)==1){
+        if(sid==s.student_id){
+            room r;
+            int prev_room=s.room;
+            FILE *file_of_rooms;
+            file_of_rooms=fopen("rooms.dat","rb+");
+
+            int num;
+            printf("Enter Room Number To be Shiffted - ");
+            scanf("%d",&num);
+            bool temp=false;
+            while(fread(&r,sizeof(room),1,file_of_rooms)==1){
+                if((r.rno==num && !r.lock) && (r.count<3 && !temp)){
+                    s.room=r.rno;
+                    fseek(file_of_students,-sizeof(student),SEEK_CUR);
+                    fwrite(&s,sizeof(student),1,file_of_students);
+                    fclose(file_of_students);
+
+                    r.students[r.count]=s;
+                    r.count+=1;
+                    fseek(file_of_rooms,-sizeof(room),SEEK_CUR);
+                    fwrite(&r,sizeof(room),1,file_of_rooms);
+                    fseek(file_of_rooms,0,SEEK_SET);
+                    temp=true;
+                    printf("addition done\n");
+                }
+                //removing from room
+                if(temp){;
+                    if(prev_room==r.rno){
+                        for(int i=0;i<r.count;i++){
+                            if(r.students[i].student_id==sid){
+                                memset(&r.students[i],0,sizeof(r.students[i]));
+                                r.count-=1;
+                                temp++;
+                                fseek(file_of_rooms,-sizeof(room),SEEK_CUR);
+                                fwrite(&r,sizeof(room),1,file_of_rooms);
+                                fclose(file_of_rooms);
+                                printf("deletion done");
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+            printf("Cannot shift student to that room");
+        }
+
+    }
+    printf("No Student found");
 }
 
 void manage_room(){
@@ -263,6 +353,8 @@ void manage_room(){
         scanf("%d",&choice);
         if(choice==1){
             view_all_rooms();
+        }if(choice==2){
+            shift_student();
         }
     }
 }
@@ -319,36 +411,4 @@ void report(){
             scanf("%d",&choice);
 
     }
-}
-
-
-int main() {
-    while(1){
-        printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-        printf("\t PG MANAGEMENT SYSTEM\n");
-        printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-        printf("1. Manage Students\n");
-        printf("2. Manage Rooms\n");
-        printf("3. Manage Lunch Boxs\n");
-        printf("4. Rent And Payment \n");
-        printf("5. Report\n");
-        printf("6. Exit\n");
-
-        int choice;
-        printf("Enter Choice - ");
-        scanf("%d",&choice);
-
-        if(choice==1){
-            manage_students();
-        }else if(choice==2){
-            manage_room();
-        }else if(choice==3){
-            manage_lunch();
-        }else if(choice==4){
-            rent();
-        }else if(choice==5){
-            report();
-        }
-    }
-    return 0;
 }

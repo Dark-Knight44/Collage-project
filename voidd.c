@@ -39,9 +39,6 @@ void main(){
         r.count = 0;       // ✅ INITIALIZED
         r.lock = false;    // ✅ INITIALIZED
 
-        // optional: clear student slots
-        memset(r.students, 0, sizeof(r.students));
-
         fwrite(&r, sizeof(room), 1, fp);
     }
 
