@@ -47,6 +47,7 @@ void manage_lunch();
 void rent();
 void report();
 void shift_student();
+void lock_room();
 
 
 int main() {
@@ -270,7 +271,7 @@ void view_all_rooms(){
     system("clear");
     while(fread(&r,sizeof(room),1,file)==1){
         printf("====================Room No. - %d====================",r.rno);
-        printf("\nlock - %s , count=%d\n",r.lock?"yes\n":"no\n",r.count);
+        printf("\nlock - %s\n",r.lock?"yes\n":"no\n");
         for(int i=0;i<r.count;i++){
             printf("%d. Student Name -%s\n\n",i+1,r.students[i].name);
         }
@@ -338,6 +339,35 @@ void shift_student(){
     printf("No Student found");
 }
 
+void lock_room(){
+    int room_to_lock;
+    printf("Enter Room Number To Lock - ");
+    scanf("%d",&room_to_lock);
+
+    FILE *file_of_rooms;
+    file_of_rooms=fopen("rooms.dat","rb+");
+    room r;
+
+    while(fread(&r,sizeof(room),1,file_of_rooms)==1){
+        if(r.rno==room_to_lock){
+            if(r.count<1){
+                r.lock=!r.lock;
+                fseek(file_of_rooms,-sizeof(room),SEEK_CUR);
+                fwrite(&r,sizeof(room),1,file_of_rooms);
+                fclose(file_of_rooms);
+                printf("Sucessfull");
+                return;
+            }else{
+                printf("Cant lock the room as it contain students");
+                fclose(file_of_rooms);
+                return;
+            }
+        }
+    }
+    printf("Cant find Room");
+    fclose(file_of_rooms);
+}
+
 void manage_room(){
     while(1){
         printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
@@ -345,7 +375,7 @@ void manage_room(){
         printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
         printf("1. View All Room \n");
         printf("2. Shift Student\n");
-        printf("3. Lock Room \n");
+        printf("3. Lock Room\\Unlock Room \n");
         printf("4. Back to Menu\n");
 
         int choice;
@@ -353,8 +383,14 @@ void manage_room(){
         scanf("%d",&choice);
         if(choice==1){
             view_all_rooms();
-        }if(choice==2){
+        }else if(choice==2){
             shift_student();
+        }else if(choice==3){
+            lock_room();
+        }else if(choice==4){
+            main();
+        }else{
+            printf("Enter a Valid Option");
         }
     }
 }
