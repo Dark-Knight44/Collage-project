@@ -27,6 +27,7 @@ typedef struct{
     date date;
     int roti;
     int id;
+    bool completed;
 }lunch;
 
 
@@ -52,6 +53,10 @@ void lock_room();
 void view_past_students();
 void view_active_students();
 void submit_lunch_req();
+void veiw_completed_delivery();
+void veiw_incomplete_delivery();
+void modify_lunch();
+
 
 int main() {
     while(1){
@@ -475,10 +480,88 @@ void submit_lunch_req(){
             fread(&last,sizeof(lunch),1,file);
             l.id=last.id+1;
         }
+        l.completed=0;
         fwrite(&l,sizeof(lunch),1,file);
         fclose(file);
     }
+}
 
+void veiw_completed_delivery(){
+    FILE *file;
+    lunch l;
+    system("clear");
+    file=fopen("lunch.dat","rb");
+    while(fread(&l,sizeof(lunch),1,file)){
+        if(l.completed){
+            printf("%d. Name -%s",l.stu.student_id,l.stu.name);
+            printf("date - %d %d %d \ntime - %d:%d",l.date.date,l.date.month,l.date.year, l.hour,l.min);
+            printf("chapatii -%d",l.roti);
+        }
+    }
+    fclose(file);
+}
+
+void veiw_incomplete_delivery(){
+    FILE *file;
+    file=fopen("lunch.dat","rb");
+    lunch l;
+    system("clear");
+    while(fread(&l,sizeof(lunch),1,file)==1){
+        if(!l.completed){
+            printf("===========ID - %d===========",l.id);
+            printf("%d. Name -%s\n",l.stu.student_id,l.stu.name);
+            printf("date - %d %d %d \ntime - %d:%d\n",l.date.date,l.date.month,l.date.year, l.hour,l.min);
+            printf("chapatii -%d",l.roti);
+        }
+    }
+    fclose(file);
+}
+
+void view_deliveries(){
+    printf("1. View Completed Deliveries\n");
+    printf("2. View Incompleted Deliveries\n");
+
+    int choice;
+    printf("Enter Choice - ");
+    scanf("%d",&choice);
+    
+    if(choice==1){
+        veiw_completed_delivery();
+    }else if(choice==2){
+        veiw_incomplete_delivery();
+    }else{
+        printf("Enter Correct Option\n");
+        view_deliveries();
+        system("clear");
+    }
+
+}
+
+void modify_lunch(){
+    FILE *file;
+    file=fopen("lunch.dat","rb+");
+
+    lunch l;
+    int id;
+    printf("Enter Lunch id");
+    scanf("%d",&id);
+
+    while(fread(&l,sizeof(lunch),1,file)==1){
+        if(l.id==id){
+        printf("Enter Date dd mm yyyy - ");
+        scanf("%d %d %d",&l.date.date,&l.date.month,&l.date.year);
+
+        printf("Enter Time (hh mm) - ");
+        scanf("%d %d",&l.hour,&l.min);
+
+        printf("Enter Number Chapatis - ");
+        scanf("%d",&l.roti);
+
+        fseek(file,-sizeof(lunch),SEEK_CUR);
+        fwrite(&l,sizeof(lunch),1,file);
+        printf("success");
+        }
+    }
 }
 
 void manage_lunch(){
@@ -488,17 +571,19 @@ void manage_lunch(){
         printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
         printf("1. Sumbit Lunch Box Request\n");
         printf("2. Modify The Request\n");
-        printf("3. Delete The Request\n");
-        printf("4. Delete The Request\n");
-        printf("5. Veiw Undone Deliveries\n");
-        printf("6. Veiw Student Lunch History\n");
-        printf("7. Back to Main Menu\n");
+        printf("3. Mark Delivery Done\n");
+        printf("4. Veiw Deliveries\n");
+        printf("5. Veiw Student Lunch History\n");
+        printf("6. Back to Main Menu\n");
 
         int choice;
         printf("Enter Choice - ");
         scanf("%d",&choice);
+        system("clear");
         if(choice==1){
             submit_lunch_req();
+        }else if(choice==5){
+            view_deliveries();
         }
     }
 } 
