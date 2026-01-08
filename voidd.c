@@ -14,13 +14,21 @@ typedef struct{
     bool is_paid;
     char phone_number[12];
     char course[10];
+    bool active;
     date doj;
 }student;
 
 
+typedef struct{
+    char time[6];
+    char name[20];
+    int room;
+}lunch;
+
+
 typedef struct {
     int rno;
-    student students[3];
+    student students[10];
     int count;
     bool lock ;
 }room;

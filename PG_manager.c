@@ -1,9 +1,7 @@
 #include<stdio.h>
 #include<stdbool.h>
-#include<time.h>
-#include<stdlib.h>
 #include<string.h>
-
+#include<stdlib.h>
 typedef struct{
     int date;
     int month;
@@ -23,15 +21,18 @@ typedef struct{
 
 
 typedef struct{
-    char time[6];
-    char name[20];
-    int room;
+    int hour;
+    int min;
+    student stu;
+    date date;
+    int roti;
+    int id;
 }lunch;
 
 
 typedef struct {
     int rno;
-    student students[20];
+    student students[10];
     int count;
     bool lock ;
 }room;
@@ -39,7 +40,7 @@ typedef struct {
 
 void remove_student();
 void view_students();
-void search_student();
+int search_student(int id,student *stu);
 void manage_students();
 void view_all_rooms();
 void manage_room();
@@ -50,6 +51,7 @@ void shift_student();
 void lock_room();
 void view_past_students();
 void view_active_students();
+void submit_lunch_req();
 
 int main() {
     while(1){
@@ -109,10 +111,14 @@ void add_student(){
     File_of_students=fopen("students.dat","rb");
     student s_last;
 
-    fseek(File_of_students,-sizeof(student),SEEK_END);
-    fread(&s_last,sizeof(student),1,File_of_students);
-
-    s1.student_id=s_last.student_id+1;
+    fseek(File_of_students,0,SEEK_END);
+    if(ftell(File_of_students)==0){
+        s1.student_id=1;
+    }else{
+        fseek(File_of_students,-sizeof(student),SEEK_END);
+        fread(&s_last,sizeof(student),1,File_of_students);
+        s1.student_id=s_last.student_id+1;
+    }
     fclose(File_of_students);
 
     //for rno.
@@ -122,8 +128,8 @@ void add_student(){
     while(fread(&r,sizeof(room),1,file_of_room)==1){
         if(r.count<3){
             r.students[r.count]=s1;
-            r.count+=1;
             s1.room=r.rno;
+            r.count+=1;
             fseek(file_of_room,-sizeof(room),SEEK_CUR);
             fwrite(&r,sizeof(room),1,file_of_room);
             fclose(file_of_room);
@@ -240,24 +246,22 @@ void view_students(){
     }
 }
 
-void search_student(){
-    int sid;
-    printf("Enter Student ID - ");
-    scanf("%d",&sid);
+int search_student(int id , student *stu){
 
     FILE *file;
     file=fopen("students.dat","rb+");
     student s;
     system("clear");
     while(fread(&s,sizeof(student),1,file)==1){
-        if(s.student_id==sid){
-            printf("NAME - %s\nPhone no. - %s\nCourse - %s\nRoom no.%d\nPaid - %s\nDate of Join - %d-%d-%d\n\n",s.name,s.phone_number,s.course,s.room,s.is_paid?"yes":"no",s.doj.date,s.doj.month,s.doj.year);
+        if(s.student_id==id){
+            *stu=s;
             fclose(file);
-            return;
+            return 1;
         }
     }
     printf("No Student Found");
     fclose(file);
+    return 0;
 }
 
 
@@ -283,7 +287,13 @@ void manage_students(){
         }else if(choice==3){
             view_students();
         }else if(choice==4){
-            search_student();
+            int sid;
+            student s;
+            printf("Enter Student ID - ");
+            scanf("%d",&sid);
+            if(search_student(sid,&s)){
+                printf("NAME - %s\nPhone no. - %s\nCourse - %s\nRoom no.%d\nPaid - %s\nDate of Join - %d-%d-%d\n\n",s.name,s.phone_number,s.course,s.room,s.is_paid?"yes":"no",s.doj.date,s.doj.month,s.doj.year);
+            }
         }else if(choice==5){
             main();
         }else{
@@ -299,11 +309,13 @@ void view_all_rooms(){
     while(fread(&r,sizeof(room),1,file)==1){
         printf("====================Room No. - %d====================",r.rno);
         printf("\nlock - %s\n",r.lock?"yes\n":"no\n");
+        printf("count = %d\n",r.count);
         for(int i=0;i<r.count;i++){
             if(r.students[i].active){
-                printf("%d. Student Name -%s\n\n",i+1,r.students[i].name);
+                printf("%d. Student Name -%s\n\n",r.students[i].student_id,r.students[i].name);
             }else{
-                i++;
+                printf("%d. Student Name -%s (PAST STUDENTS)\n\n",r.students[i].student_id,r.students[i].name);
+                r.count++;
             }
         }
     }
@@ -426,6 +438,48 @@ void manage_room(){
     }
 }
 
+void submit_lunch_req(){
+    system("clear");
+    printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+    printf("\t LUNCH MANAGEMENT\n");
+    printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+
+    FILE *file;
+    file=fopen("lunch.dat","rb+");
+
+    lunch l;
+
+    int id;
+    printf("Enter Student Id - ");
+    scanf("%d",&id);
+
+    student stu;
+    if(search_student(id,&stu)){
+        printf("Enter Date dd mm yyyy - ");
+        scanf("%d %d %d",&l.date.date,&l.date.month,&l.date.year);
+        
+        l.stu=stu;
+
+        printf("Enter Time (hh mm) - ");
+        scanf("%d %d",&l.hour,&l.min);
+
+        printf("Enter Number Chapatis - ");
+        scanf("%d",&l.roti);
+
+        fseek(file,0,SEEK_END);
+        if(ftell(file)==0){
+            l.id=1;
+        }else{
+            fseek(file,-sizeof(lunch),SEEK_END);
+            lunch last;
+            fread(&last,sizeof(lunch),1,file);
+            l.id=last.id+1;
+        }
+        fwrite(&l,sizeof(lunch),1,file);
+        fclose(file);
+    }
+
+}
 
 void manage_lunch(){
     while(1){
@@ -435,13 +489,17 @@ void manage_lunch(){
         printf("1. Sumbit Lunch Box Request\n");
         printf("2. Modify The Request\n");
         printf("3. Delete The Request\n");
-        printf("4. Veiw Today's Delivery Schedule\n");
-        printf("5. Veiw Student Lunch History\n");
-        printf("6. Back to Main Menu\n");
+        printf("4. Delete The Request\n");
+        printf("5. Veiw Undone Deliveries\n");
+        printf("6. Veiw Student Lunch History\n");
+        printf("7. Back to Main Menu\n");
 
         int choice;
         printf("Enter Choice - ");
         scanf("%d",&choice);
+        if(choice==1){
+            submit_lunch_req();
+        }
     }
 } 
 
