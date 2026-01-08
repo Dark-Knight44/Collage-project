@@ -17,6 +17,7 @@ typedef struct{
     bool is_paid;
     char phone_number[12];
     char course[10];
+    bool active;
     date doj;
 }student;
 
@@ -57,7 +58,7 @@ int main(){
     s1.is_paid=1;
     s1.room=1;
     s1.student_id=1;
-
+    s1.active=1;
 
     room r;
     r.count=1;

@@ -17,6 +17,7 @@ typedef struct{
     bool is_paid;
     char phone_number[12];
     char course[10];
+    bool active;
     date doj;
 }student;
 
@@ -30,15 +31,14 @@ typedef struct{
 
 typedef struct {
     int rno;
-    student students[3];
+    student students[20];
     int count;
     bool lock ;
 }room;
 
 
-void view_all_students();
-void edit_student_details();
-void view_all_students();
+void remove_student();
+void view_students();
 void search_student();
 void manage_students();
 void view_all_rooms();
@@ -48,7 +48,8 @@ void rent();
 void report();
 void shift_student();
 void lock_room();
-
+void view_past_students();
+void view_active_students();
 
 int main() {
     while(1){
@@ -101,6 +102,7 @@ void add_student(){
     printf("Enter date of joining(dd mm yyyy) - ");
     scanf("%d %d %d",&s1.doj.date,&s1.doj.month,&s1.doj.year);
     s1.is_paid=1;
+    s1.active =1;
     //for id
 
     FILE *File_of_students;
@@ -141,7 +143,7 @@ void add_student(){
     manage_students();
 }
 
-void edit_student_details(){
+void remove_student(){
     
     int stu_id;
     printf("Enter Student Id -");
@@ -155,20 +157,7 @@ void edit_student_details(){
 
     while(fread(&stu,sizeof(student),1,file)==1){
         if(stu_id==stu.student_id){
-            printf("\nEnter Name Of Student - ");
-            fgets(stu.name,20,stdin);
-            stu.name[strcspn(stu.name,"\n")]='\0';
-
-            printf("\nEnter Phone Number - ");
-            fgets(stu.phone_number,12,stdin);
-            stu.phone_number[strcspn(stu.phone_number,"\n")]='\0';
-
-            printf("\nEnter Course Name - ");
-            fgets(stu.course,10,stdin);
-            stu.course[strcspn(stu.course,"\n")]='\0';
-
-            printf("Enter date of joining(dd mm yyyy) - ");
-            scanf("%d %d %d",&stu.doj.date,&stu.doj.month,&stu.doj.year);
+            stu.active=0;
 
             fseek(file,-sizeof(student),SEEK_CUR);
             fwrite(&stu,sizeof(student),1,file);
@@ -185,10 +174,11 @@ void edit_student_details(){
                     for(int i=0;i<r.count;i++){
                         if(r.students[i].student_id==stu.student_id){
                             r.students[i]=stu;
+                            r.count--;
                             fseek(file_of_room,-sizeof(room),SEEK_CUR);
                             fwrite(&r,sizeof(room),1,file_of_room);
                             printf("Updated The Records IN Room File\n");
-                            fclose(file);
+                            fclose(file_of_room);
                             return;
                         }
                     }
@@ -200,17 +190,54 @@ void edit_student_details(){
     fclose(file);
 }
 
-
-void view_all_students(){
+void view_past_students(){
     FILE *file_of_students;
     file_of_students=fopen("students.dat","rb");
     student s1;
     system("clear");
+    
+
     while(fread(&s1,sizeof(student),1,file_of_students)==1){
-        printf("Student ID :%d\nStudent Name -%s\nPhone Number - %s\nRoom Number - %d\nPaid -%s\nCourse - %s\n\n",s1.student_id,s1.name,s1.phone_number,s1.room,(s1.is_paid?"yes":"no"),s1.course);
+        printf("%d",s1.active);
+        if(!(s1.active)){
+            printf("Student ID :%d\nStudent Name -%s\nPhone Number - %s\nRoom Number - %d\nPaid -%s\nCourse - %s\n\n",s1.student_id,s1.name,s1.phone_number,s1.room,(s1.is_paid?"yes":"no"),s1.course);
+        }
     }
     fclose(file_of_students);
     manage_students();
+}
+
+void view_active_students(){
+    FILE *file_of_students;
+    file_of_students=fopen("students.dat","rb");
+    student s1;
+    system("clear");
+
+    while(fread(&s1,sizeof(student),1,file_of_students)==1){
+        printf("%d",s1.active);
+        if(s1.active){
+            printf("Student ID :%d\nStudent Name -%s\nPhone Number - %s\nRoom Number - %d\nPaid -%s\nCourse - %s\n\n",s1.student_id,s1.name,s1.phone_number,s1.room,(s1.is_paid?"yes":"no"),s1.course);
+        }
+    }
+    fclose(file_of_students);
+    manage_students();
+}
+
+void view_students(){
+    system("clear");
+    printf("1.View All Active Students\n");
+    printf("2.View All Past Students\n");
+    int choice;
+    printf("Enter Your Choice - ");
+    scanf("%d",&choice);
+    if(choice==1){
+        view_active_students();
+    }else if(choice==2){
+        view_past_students();
+    }else{
+        printf("Enter Correct Choice\n");
+        manage_students();
+    }
 }
 
 void search_student(){
@@ -239,7 +266,7 @@ void manage_students(){
     printf("\t STUDENT MANAGEMENT\n");
     printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
     printf("1. Add Students\n");
-    printf("2. Edit Student Details\n");
+    printf("2. Remove Student\n");
     printf("3. View All Students\n");
     printf("4. Search Students\n");
     printf("5. Back To Main Menu\n");
@@ -252,9 +279,9 @@ void manage_students(){
         if(choice==1){
             add_student();
         }else if(choice==2){
-            edit_student_details();
+            remove_student();
         }else if(choice==3){
-            view_all_students();
+            view_students();
         }else if(choice==4){
             search_student();
         }else if(choice==5){
@@ -273,7 +300,11 @@ void view_all_rooms(){
         printf("====================Room No. - %d====================",r.rno);
         printf("\nlock - %s\n",r.lock?"yes\n":"no\n");
         for(int i=0;i<r.count;i++){
-            printf("%d. Student Name -%s\n\n",i+1,r.students[i].name);
+            if(r.students[i].active){
+                printf("%d. Student Name -%s\n\n",i+1,r.students[i].name);
+            }else{
+                i++;
+            }
         }
     }
     char temp;
@@ -319,7 +350,7 @@ void shift_student(){
                     if(prev_room==r.rno){
                         for(int i=0;i<r.count;i++){
                             if(r.students[i].student_id==sid){
-                                memset(&r.students[i],0,sizeof(r.students[i]));
+                                r.students[i].active=0;
                                 r.count-=1;
                                 temp++;
                                 fseek(file_of_rooms,-sizeof(room),SEEK_CUR);
