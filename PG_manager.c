@@ -57,6 +57,7 @@ void veiw_completed_delivery();
 void veiw_incomplete_delivery();
 void modify_lunch();
 void mark_done();
+void student_lunch_history();
 
 
 int main() {
@@ -590,6 +591,24 @@ void mark_done(){
     fclose(file);
 }
 
+void student_lunch_history(){
+    FILE *file;
+    file=fopen("lunch.dat","rb");
+    lunch l;
+
+    int stu_id;
+    printf("Enter Student ID - ");
+    scanf("%d",&stu_id);
+    while(fread(&l,sizeof(lunch),1,file)==1){
+        if(stu_id==l.stu.student_id){
+            printf("\n\n===========ID - %d===========\n\n",l.id);
+            printf("%d. Name -%s\n",l.stu.student_id,l.stu.name);
+            printf("date - %d %d %d \ntime - %d:%d\n",l.date.date,l.date.month,l.date.year, l.hour,l.min);
+            printf("chapatii -%d\n",l.roti);
+        }
+    }
+}
+
 void manage_lunch(){
     while(1){
         printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
@@ -614,6 +633,12 @@ void manage_lunch(){
             mark_done();
         }else if(choice==4){
             view_deliveries();
+        }else if(choice==5){
+            student_lunch_history();
+        }else if(choice==6){
+            main();
+        }else{
+            printf("Enter Correct Option");
         }
     }
 } 

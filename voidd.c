@@ -18,14 +18,6 @@ typedef struct{
     date doj;
 }student;
 
-
-typedef struct{
-    char time[6];
-    char name[20];
-    int room;
-}lunch;
-
-
 typedef struct {
     int rno;
     student students[10];
@@ -44,10 +36,11 @@ void main(){
 
     for (int i = 1; i <= 30; i++) {
         r.rno = i;
-        r.count = 0;       // ✅ INITIALIZED
-        r.lock = false;    // ✅ INITIALIZED
+        r.count = 0;      
+        r.lock = false;    
 
         fwrite(&r, sizeof(room), 1, fp);
     }
 
-    fclose(fp);}
+    fclose(fp);
+}
