@@ -56,6 +56,7 @@ void submit_lunch_req();
 void veiw_completed_delivery();
 void veiw_incomplete_delivery();
 void modify_lunch();
+void mark_done();
 
 
 int main() {
@@ -495,7 +496,7 @@ void veiw_completed_delivery(){
         if(l.completed){
             printf("%d. Name -%s",l.stu.student_id,l.stu.name);
             printf("date - %d %d %d \ntime - %d:%d",l.date.date,l.date.month,l.date.year, l.hour,l.min);
-            printf("chapatii -%d",l.roti);
+            printf("chapatii -%d\n",l.roti);
         }
     }
     fclose(file);
@@ -508,10 +509,10 @@ void veiw_incomplete_delivery(){
     system("clear");
     while(fread(&l,sizeof(lunch),1,file)==1){
         if(!l.completed){
-            printf("===========ID - %d===========",l.id);
+            printf("\n\n===========ID - %d===========\n\n",l.id);
             printf("%d. Name -%s\n",l.stu.student_id,l.stu.name);
             printf("date - %d %d %d \ntime - %d:%d\n",l.date.date,l.date.month,l.date.year, l.hour,l.min);
-            printf("chapatii -%d",l.roti);
+            printf("chapatii -%d\n",l.roti);
         }
     }
     fclose(file);
@@ -547,7 +548,7 @@ void modify_lunch(){
     scanf("%d",&id);
 
     while(fread(&l,sizeof(lunch),1,file)==1){
-        if(l.id==id){
+        if(l.id==id && !l.completed){
         printf("Enter Date dd mm yyyy - ");
         scanf("%d %d %d",&l.date.date,&l.date.month,&l.date.year);
 
@@ -560,8 +561,33 @@ void modify_lunch(){
         fseek(file,-sizeof(lunch),SEEK_CUR);
         fwrite(&l,sizeof(lunch),1,file);
         printf("success");
+        fclose(file);
+        return;
         }
     }
+    fclose(file);
+    printf("Couldn't Edit The Details (Completed or no ID found)");
+}
+
+void mark_done(){
+    FILE *file;
+    file=fopen("lunch.dat","rb+");
+    int id;
+    printf("Enter Lunch ID -");
+    scanf("%d",&id);
+    lunch l;
+    while(fread(&l,sizeof(lunch),1,file)==1){
+        if(l.id==id && !l.completed){
+            l.completed=1;
+            fseek(file,-sizeof(lunch),SEEK_CUR);
+            fwrite(&l,sizeof(lunch),1,file);
+            printf("Success\n");
+            fclose(file);
+            return;
+        }
+    }
+    printf("Couldn't Mark it Done (Already Completed or No ID Found)");
+    fclose(file);
 }
 
 void manage_lunch(){
@@ -582,7 +608,11 @@ void manage_lunch(){
         system("clear");
         if(choice==1){
             submit_lunch_req();
-        }else if(choice==5){
+        }else if(choice==2){
+            modify_lunch();
+        }else if(choice==3){
+            mark_done();
+        }else if(choice==4){
             view_deliveries();
         }
     }
