@@ -1,13 +1,15 @@
 #include<stdio.h>
 #include<stdbool.h>
 #include<string.h>
-typedef struct{
+typedef struct
+{
     int date;
     int month;
     int year;
-}date;
+} date;
 
-typedef struct{
+typedef struct
+{
     char name[20];
     int student_id;
     int room;
@@ -16,14 +18,26 @@ typedef struct{
     char course[10];
     bool active;
     date doj;
-}student;
+} student;
 
-typedef struct {
+typedef struct
+{
+    int hour;
+    int min;
+    student stu;
+    date date;
+    int roti;
+    int id;
+    bool completed;
+} lunch;
+
+typedef struct
+{
     int rno;
     student students[10];
     int count;
-    bool lock ;
-}room;
+    bool lock;
+} room;
 
 void main(){
     FILE *fp = fopen("rooms.dat", "wb");
