@@ -64,8 +64,30 @@ void record_payment();
 void pending_students();
 void start_new_month();
 
+void initialize_room_file()
+{
+    FILE *file;
+    file = fopen("rooms.dat", "rb+");
+
+    fseek(file, 0, SEEK_END);
+    if (ftell(file) == 0)
+    {
+        room r;
+        for (int i = 1; i <= 30; i++)
+        {
+            r.rno = i;
+            r.count = 0;
+            r.lock = false;
+
+            fwrite(&r, sizeof(room), 1, file);
+        }
+        fclose(file);
+    }
+}
+
 int main()
 {
+    initialize_room_file();
     system("clear");
     while (1)
     {
@@ -136,7 +158,7 @@ void add_student()
     fgets(s1.course, 10, stdin);
     s1.course[strcspn(s1.course, "\n")] = '\0';
 
-    printf("Enter date of joining(dd mm yyyy) - ");
+    printf("\nEnter date of joining(dd mm yyyy) - ");
     scanf("%d %d %d", &s1.doj.date, &s1.doj.month, &s1.doj.year);
     s1.is_paid = 1;
     s1.active = 1;
@@ -238,6 +260,7 @@ void remove_student()
                             fwrite(&r, sizeof(room), 1, file_of_room);
                             system("clear");
                             printf("Updated The Records IN Room File\n");
+                            manage_students();
                             fclose(file_of_room);
                             return;
                         }
@@ -248,6 +271,7 @@ void remove_student()
     }
     system("clear");
     printf("Student ID Not Found");
+    manage_students();
     fclose(file);
 }
 
@@ -398,6 +422,7 @@ void manage_students()
             {
                 printf("NAME - %s\nPhone no. - %s\nCourse - %s\nRoom no.%d\nPaid - %s\nDate of Join - %d-%d-%d\n\n", s.name, s.phone_number, s.course, s.room, s.is_paid ? "yes" : "no", s.doj.date, s.doj.month, s.doj.year);
             }
+            manage_students();
         }
         else if (choice == 5)
         {
@@ -655,8 +680,8 @@ void veiw_completed_delivery()
     {
         if (l.completed)
         {
-            printf("%d. Name -%s", l.stu.student_id, l.stu.name);
-            printf("date - %d %d %d \ntime - %d:%d", l.date.date, l.date.month, l.date.year, l.hour, l.min);
+            printf("%d. Name -%s\n", l.stu.student_id, l.stu.name);
+            printf("date - %d %d %d \ntime - %d:%d\n", l.date.date, l.date.month, l.date.year, l.hour, l.min);
             printf("chapatii -%d\n", l.roti);
         }
     }
