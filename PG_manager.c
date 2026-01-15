@@ -239,7 +239,6 @@ void remove_student()
             fseek(file, -sizeof(student), SEEK_CUR);
             fwrite(&stu, sizeof(student), 1, file);
             printf("\nUpdated The Records in Student File\n");
-
             fclose(file);
 
             FILE *file_of_room;
@@ -254,15 +253,13 @@ void remove_student()
                     {
                         if (r.students[i].student_id == stu.student_id)
                         {
-                            r.students[i] = stu;
                             r.count--;
+                            r.students[i].active=0;
                             fseek(file_of_room, -sizeof(room), SEEK_CUR);
                             fwrite(&r, sizeof(room), 1, file_of_room);
-                            system("clear");
                             printf("Updated The Records IN Room File\n");
-                            manage_students();
                             fclose(file_of_room);
-                            return;
+                            manage_students();
                         }
                     }
                 }
@@ -271,8 +268,8 @@ void remove_student()
     }
     system("clear");
     printf("Student ID Not Found");
-    manage_students();
     fclose(file);
+    manage_students();
 }
 
 void view_past_students()
