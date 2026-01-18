@@ -208,6 +208,7 @@ void add_student()
     system("clear");
 
     printf("Success\n\n");
+    printf("Assigned Room-%d\n Assigned Student ID-%d",s1.room,s1.student_id);
 
     fclose(file_of_students);
     manage_students();
@@ -633,6 +634,10 @@ void submit_lunch_req()
     student stu;
     if (search_student(id, &stu))
     {
+        if(!stu.active){
+            printf("Student Removed");
+            return;
+        }
         printf("Enter Date dd mm yyyy - ");
         scanf("%d %d %d", &l.date.date, &l.date.month, &l.date.year);
 
@@ -661,6 +666,7 @@ void submit_lunch_req()
         fclose(file);
         system("clear");
         printf("Success");
+        printf("Assigned Lunch ID - %d",l.id);
     }
 }
 
@@ -792,7 +798,7 @@ void mark_done()
     lunch l;
     while (fread(&l, sizeof(lunch), 1, file) == 1)
     {
-        if (l.id == id && !l.completed)
+        if (l.id == id && !l.completed )
         {
             l.completed = 1;
             fseek(file, -sizeof(lunch), SEEK_CUR);
