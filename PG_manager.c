@@ -208,7 +208,7 @@ void add_student()
     system("clear");
 
     printf("Success\n\n");
-    printf("Assigned Room-%d\n Assigned Student ID-%d",s1.room,s1.student_id);
+    printf("Assigned Room-%d\n Assigned Student ID-%d", s1.room, s1.student_id);
 
     fclose(file_of_students);
     manage_students();
@@ -255,7 +255,7 @@ void remove_student()
                         if (r.students[i].student_id == stu.student_id)
                         {
                             r.count--;
-                            r.students[i].active=0;
+                            r.students[i].active = 0;
                             fseek(file_of_room, -sizeof(room), SEEK_CUR);
                             fwrite(&r, sizeof(room), 1, file_of_room);
                             printf("Updated The Records IN Room File\n");
@@ -634,7 +634,8 @@ void submit_lunch_req()
     student stu;
     if (search_student(id, &stu))
     {
-        if(!stu.active){
+        if (!stu.active)
+        {
             printf("Student Removed");
             return;
         }
@@ -666,7 +667,7 @@ void submit_lunch_req()
         fclose(file);
         system("clear");
         printf("Success");
-        printf("Assigned Lunch ID - %d",l.id);
+        printf("Assigned Lunch ID - %d", l.id);
     }
 }
 
@@ -798,7 +799,7 @@ void mark_done()
     lunch l;
     while (fread(&l, sizeof(lunch), 1, file) == 1)
     {
-        if (l.id == id && !l.completed )
+        if (l.id == id && !l.completed)
         {
             l.completed = 1;
             fseek(file, -sizeof(lunch), SEEK_CUR);
